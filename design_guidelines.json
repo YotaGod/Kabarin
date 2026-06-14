@@ -1,0 +1,81 @@
+{
+  "project_name": "Smart City Report Classifier & Dispatcher",
+  "theme": "light",
+  "archetype": "Archetype 4: Swiss & High-Contrast",
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "Plus Jakarta Sans",
+    "font_install_instructions": "Add Google Fonts links for Outfit and Plus Jakarta Sans in index.html.",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight font-semibold",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-medium",
+      "h3": "text-xl sm:text-2xl font-medium",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed",
+      "small_labels": "text-xs tracking-[0.2em] uppercase font-bold text-muted-foreground"
+    }
+  },
+  "colors": {
+    "primary": { "hex": "#2563EB", "hsl": "221.2 83.2% 53.3%", "usage": "CTAs, Main Navigation, Active States" },
+    "success": { "hex": "#10B981", "hsl": "160 84% 39%", "usage": "Resolved status, Positive KPIs, Safe zones on map" },
+    "warning": { "hex": "#F59E0B", "hsl": "38 92% 50%", "usage": "In Progress status, Medium priority, Alerts" },
+    "danger": { "hex": "#EF4444", "hsl": "0 84.2% 60.2%", "usage": "Critical priority, SLA breaches, High urgency map markers" },
+    "background": { "hex": "#F8FAFC", "hsl": "210 20% 98%", "usage": "App background (Slate 50)" },
+    "surface": { "hex": "#FFFFFF", "hsl": "0 0% 100%", "usage": "Cards, Dialogs, Dropdowns" },
+    "muted": { "hex": "#F1F5F9", "hsl": "210 40% 96.1%", "usage": "Secondary backgrounds, Hover states" },
+    "foreground": { "hex": "#0F172A", "hsl": "222.2 47.4% 11.2%", "usage": "Primary text" },
+    "border": { "hex": "#E2E8F0", "hsl": "214.3 31.8% 91.4%", "usage": "Dividers, Card borders" }
+  },
+  "layout_and_spacing": {
+    "philosophy": "Generous Spacing for Citizen Portal, Control Room Density for Dashboards",
+    "citizen_portal": {
+      "grid": "grid-cols-1 md:grid-cols-12 gap-8",
+      "spacing": "p-6 md:p-12",
+      "card_style": "rounded-lg border border-border/40 shadow-sm bg-white"
+    },
+    "dashboards": {
+      "grid": "grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4",
+      "spacing": "p-4 md:p-6",
+      "card_style": "rounded-md border border-border shadow-none bg-white",
+      "table_density": "compact, py-2 px-4 cells"
+    }
+  },
+  "components": {
+    "buttons": "rounded-md font-medium transition-all duration-200 active:scale-95. Primary: bg-primary text-white hover:bg-primary/90.",
+    "cards": "Never use soft dropshadows. Use crisp 1px borders (border-border). For hover states: -translate-y-1, shadow-md.",
+    "inputs": "Shadcn standard inputs. rounded-md, border-border, focus:ring-2 focus:ring-primary/20 focus:border-primary.",
+    "badges": "Used for statuses. Rounded-full, text-xs font-semibold px-2.5 py-0.5.",
+    "map": "Leaflet or Mapbox. Render with grayscale tiles to let data markers (Red/Orange/Yellow/Green) stand out.",
+    "data_testids": "MANDATORY on all interactive elements (e.g., data-testid='submit-report-btn')"
+  },
+  "icons": {
+    "library": "@phosphor-icons/react",
+    "install_command": "yarn add @phosphor-icons/react",
+    "style": "duotone for citizen portal, regular for dense dashboard tables"
+  },
+  "media_and_images": {
+    "rules": "Use the exact URLs below. Do not use placehold.it or via.placeholder.com.",
+    "urls": {
+      "hero_background": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2070&auto=format&fit=crop",
+      "citizen_reporting": "https://images.unsplash.com/photo-1520333789090-1afc82db536a?q=80&w=2071&auto=format&fit=crop",
+      "city_map_abstract": "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop",
+      "empty_state_clipboard": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=2070&auto=format&fit=crop",
+      "avatar_officer": "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop",
+      "avatar_citizen": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop"
+    }
+  },
+  "micro_interactions": {
+    "hover_states": "Always explicitly define hover:text-color when using hover:bg-color.",
+    "focus_states": "focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary",
+    "loading": "Use skeleton loaders matching exactly the shape of the content to be loaded."
+  },
+  "instructions_to_main_agent": [
+    "Ensure all HTML/JSX has proper semantic tags.",
+    "Implement a unified Layout component that handles navigation across Citizen, Officer, and Admin roles.",
+    "For the Citizen form, make the image/video upload prominent and mobile-friendly.",
+    "In the Dashboard tables, use color-coded badges for urgency/status exactly matching the provided Hex/HSL values.",
+    "Ensure the map implementation uses the provided status colors for markers.",
+    "All forms and interactive UI components MUST use data-testid attributes.",
+    "Run yarn add @phosphor-icons/react before utilizing the icons."
+  ]
+}
