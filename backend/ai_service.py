@@ -13,56 +13,56 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
 
 CATEGORIES = [
-    "Road Damage", "Flood", "Garbage", "Traffic", "Public Lighting",
-    "Water Leak", "Crime", "Vandalism", "Public Facility Damage",
-    "Environmental Issue", "Other"
+    "Kerusakan Jalan", "Banjir", "Sampah", "Lalu Lintas", "Penerangan Jalan",
+    "Kebocoran Air", "Kriminalitas", "Vandalisme", "Kerusakan Fasilitas Umum",
+    "Masalah Lingkungan", "Lainnya"
 ]
-URGENCY_LEVELS = ["Critical", "High", "Medium", "Low"]
-SENTIMENTS = ["Emergency", "Complaint", "Suggestion", "Information"]
+URGENCY_LEVELS = ["Kritis", "Tinggi", "Sedang", "Rendah"]
+SENTIMENTS = ["Darurat", "Keluhan", "Saran", "Informasi"]
 
 # Default routing: category -> department name
 DEFAULT_ROUTING = {
-    "Road Damage": "Public Works Department",
-    "Flood": "Disaster Management Department",
-    "Garbage": "Sanitation Department",
-    "Public Lighting": "Electrical Infrastructure Department",
-    "Water Leak": "Water Utility Department",
-    "Crime": "Public Safety Department",
-    "Traffic": "Traffic Management Department",
-    "Vandalism": "Public Safety Department",
-    "Public Facility Damage": "Public Works Department",
-    "Environmental Issue": "Environmental Department",
-    "Other": "General Affairs Department",
+    "Kerusakan Jalan": "Dinas Pekerjaan Umum",
+    "Banjir": "Dinas Penanggulangan Bencana",
+    "Sampah": "Dinas Kebersihan",
+    "Penerangan Jalan": "Dinas Infrastruktur Listrik",
+    "Kebocoran Air": "Dinas Air Bersih",
+    "Kriminalitas": "Dinas Keamanan Publik",
+    "Lalu Lintas": "Dinas Perhubungan",
+    "Vandalisme": "Dinas Keamanan Publik",
+    "Kerusakan Fasilitas Umum": "Dinas Pekerjaan Umum",
+    "Masalah Lingkungan": "Dinas Lingkungan Hidup",
+    "Lainnya": "Dinas Umum",
 }
 
 # SLA hours per category
 SLA_HOURS = {
-    "Road Damage": 48,
-    "Flood": 2,
-    "Garbage": 24,
-    "Public Lighting": 24,
-    "Water Leak": 6,
-    "Crime": 1,
-    "Traffic": 12,
-    "Vandalism": 48,
-    "Public Facility Damage": 72,
-    "Environmental Issue": 48,
-    "Other": 72,
+    "Kerusakan Jalan": 48,
+    "Banjir": 2,
+    "Sampah": 24,
+    "Penerangan Jalan": 24,
+    "Kebocoran Air": 6,
+    "Kriminalitas": 1,
+    "Lalu Lintas": 12,
+    "Vandalisme": 48,
+    "Kerusakan Fasilitas Umum": 72,
+    "Masalah Lingkungan": 48,
+    "Lainnya": 72,
 }
 
-SYSTEM_PROMPT = """You are an AI dispatcher for a Smart City public issue reporting platform.
-Given a citizen's report (title + description, optionally an image), classify it.
+SYSTEM_PROMPT = """Anda adalah AI dispatcher untuk platform pelaporan masalah publik Kota Pintar.
+Diberikan laporan warga (judul + deskripsi, opsional gambar), klasifikasikan laporan tersebut.
 
-Return ONLY valid JSON with this exact schema (no markdown, no prose):
+Kembalikan HANYA JSON valid dengan skema yang tepat ini (tanpa markdown, tanpa prosa):
 {
-  "category": "<one of: Road Damage, Flood, Garbage, Traffic, Public Lighting, Water Leak, Crime, Vandalism, Public Facility Damage, Environmental Issue, Other>",
-  "urgency": "<one of: Critical, High, Medium, Low>",
-  "sentiment": "<one of: Emergency, Complaint, Suggestion, Information>",
+  "category": "<salah satu dari: Kerusakan Jalan, Banjir, Sampah, Lalu Lintas, Penerangan Jalan, Kebocoran Air, Kriminalitas, Vandalisme, Kerusakan Fasilitas Umum, Masalah Lingkungan, Lainnya>",
+  "urgency": "<salah satu dari: Kritis, Tinggi, Sedang, Rendah>",
+  "sentiment": "<salah satu dari: Darurat, Keluhan, Saran, Informasi>",
   "confidence": <integer 0-100>,
-  "summary": "<one-sentence summary for the officer, max 200 chars>"
+  "summary": "<ringkasan satu kalimat untuk petugas, maksimal 200 karakter>"
 }
 
-Be objective. Critical urgency only for life-safety risks (active flood, fire, crime, gas leak).
+Bersikap objektif. Urgensi Kritis hanya untuk risiko keselamatan jiwa (banjir aktif, kebakaran, kriminalitas, kebocoran gas).
 """
 
 
@@ -86,32 +86,32 @@ def _extract_json(text: str) -> Optional[dict]:
 def _fallback_classification(title: str, description: str) -> dict:
     text = f"{title} {description}".lower()
     rules = [
-        ("Flood", ["flood", "water logging", "inundation", "submerged"]),
-        ("Water Leak", ["leak", "burst pipe", "pipe leak", "water leak"]),
-        ("Garbage", ["garbage", "trash", "waste", "rubbish", "litter"]),
-        ("Road Damage", ["pothole", "road", "crack", "broken pavement"]),
-        ("Public Lighting", ["street light", "lamp", "lighting", "dark street"]),
-        ("Crime", ["robbery", "theft", "assault", "crime", "violence"]),
-        ("Traffic", ["traffic", "jam", "signal", "congestion"]),
-        ("Vandalism", ["graffiti", "vandalism", "damaged property"]),
-        ("Environmental Issue", ["pollution", "smoke", "noise", "dump"]),
+        ("Banjir", ["banjir", "genangan", "terendam", "air meluap"]),
+        ("Kebocoran Air", ["bocor", "pipa bocor", "pipa pecah", "kebocoran air"]),
+        ("Sampah", ["sampah", "limbah", "kotoran", "tong sampah"]),
+        ("Kerusakan Jalan", ["lubang", "jalan rusak", "retak", "aspal rusak"]),
+        ("Penerangan Jalan", ["lampu jalan", "lampu mati", "penerangan", "gelap"]),
+        ("Kriminalitas", ["perampokan", "pencurian", "kejahatan", "kekerasan"]),
+        ("Lalu Lintas", ["lalu lintas", "macet", "rambu", "kemacetan"]),
+        ("Vandalisme", ["coret-coret", "vandalisme", "rusak properti"]),
+        ("Masalah Lingkungan", ["polusi", "asap", "kebisingan", "pembuangan"]),
     ]
-    category = "Other"
+    category = "Lainnya"
     for cat, kws in rules:
         if any(k in text for k in kws):
             category = cat
             break
-    urgency = "Medium"
-    if any(k in text for k in ["urgent", "emergency", "danger", "fire", "blood", "injury", "critical"]):
-        urgency = "Critical"
-    elif any(k in text for k in ["broken", "overflow", "leak", "flood", "crime"]):
-        urgency = "High"
+    urgency = "Sedang"
+    if any(k in text for k in ["mendesak", "darurat", "bahaya", "kebakaran", "darah", "luka", "kritis"]):
+        urgency = "Kritis"
+    elif any(k in text for k in ["rusak", "meluap", "bocor", "banjir", "kejahatan"]):
+        urgency = "Tinggi"
     return {
         "category": category,
         "urgency": urgency,
-        "sentiment": "Complaint",
+        "sentiment": "Keluhan",
         "confidence": 55,
-        "summary": (title or description or "Citizen report")[:200],
+        "summary": (title or description or "Laporan warga")[:200],
     }
 
 
@@ -160,7 +160,7 @@ async def classify_report(
 
 
 def route_to_department(category: str) -> str:
-    return DEFAULT_ROUTING.get(category, "General Affairs Department")
+    return DEFAULT_ROUTING.get(category, "Dinas Umum")
 
 
 def sla_hours_for(category: str) -> int:
@@ -169,7 +169,7 @@ def sla_hours_for(category: str) -> int:
 
 def calculate_priority_score(urgency: str, upvotes: int, nearby_count: int, confidence: int) -> int:
     """Priority 0-100 based on urgency, upvotes, nearby reports, confidence."""
-    urgency_weight = {"Critical": 60, "High": 45, "Medium": 25, "Low": 10}.get(urgency, 20)
+    urgency_weight = {"Kritis": 60, "Tinggi": 45, "Sedang": 25, "Rendah": 10}.get(urgency, 20)
     upvote_score = min(upvotes * 2, 20)
     nearby_score = min(nearby_count * 3, 15)
     confidence_score = int(confidence * 0.05)  # 0-5

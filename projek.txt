@@ -1,0 +1,1155 @@
+================================================================================
+                    DOKUMENTASI PROYEK KOTA PINTAR
+                    Sistem Pelaporan Masalah Publik Berbasis AI
+================================================================================
+
+===============================================================================
+1. RINGKASAN PROYEK
+===============================================================================
+
+Nama Aplikasi: Kota Pintar (Smart City)
+Tujuan: Platform pelaporan masalah publik yang memungkinkan warga melaporkan 
+        masalah infrastruktur kota (lubang jalan, banjir, sampah, dll) dan 
+        secara otomatis mengarahkannya ke dinas pemerintah yang tepat menggunakan 
+        AI.
+
+Fitur Utama:
+- Pelaporan masalah oleh warga dengan foto, lokasi GPS, dan deskripsi
+- Klasifikasi otomatis menggunakan AI (Gemini)
+- Routing cerdas ke departemen yang sesuai
+- Pelacakan status laporan secara real-time
+- Dashboard untuk Warga, Petugas, dan Admin
+- Notifikasi real-time via WebSocket
+- Sistem voting dan komentar
+- Analytics dan KPI untuk admin
+- Peta interaktif dengan visualisasi laporan
+
+Target Pengguna:
+1. Warga (Citizen) - Melaporkan dan memantau masalah
+2. Petugas (Officer) - Menangani dan menyelesaikan laporan
+3. Admin - Mengelola dinas, petugas, dan melihat analytics
+
+
+===============================================================================
+2. ARSITEKTUR SISTEM
+===============================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          ARSITEKTUR 3-TIER                              │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         LAYER 1: FRONTEND                                │
+│                     (React + Tailwind CSS)                               │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐                   │
+│  │   Landing   │  │   Register  │  │    Login     │                   │
+│  │    Page     │  │   / Login   │  │  Dashboard   │                   │
+│  └─────────────┘  └─────────────┘  └──────────────┘                   │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐                   │
+│  │   Citizen   │  │   Officer   │  │    Admin     │                   │
+│  │  Dashboard  │  │  Dashboard  │  │  Dashboard   │                   │
+│  └─────────────┘  └─────────────┘  └──────────────┘                   │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐                   │
+│  │   Submit    │  │   Report    │  │   City Map   │                   │
+│  │   Report    │  │   Detail    │  │  View (Peta) │                   │
+│  └─────────────┘  └─────────────┘  └──────────────┘                   │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────┐               │
+│  │  Components: Navbar, MapView, ReportCard, Badges    │               │
+│  │  Auth Context: JWT Token Management                 │               │
+│  │  WebSocket: Real-time notifications                 │               │
+│  └─────────────────────────────────────────────────────┘               │
+└──────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   │ HTTP/WS
+                                   │
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         LAYER 2: BACKEND                                 │
+│                    (FastAPI + Python 3.11+)                              │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────┐          │
+│  │                    REST API ENDPOINTS                     │          │
+│  │  • /api/auth/* - Authentication (register, login, me)    │          │
+│  │  • /api/reports/* - CRUD laporan                         │          │
+│  │  • /api/departments/* - Manajemen dinas                  │          │
+│  │  • /api/officers/* - Manajemen petugas                   │          │
+│  │  • /api/routing/* - Aturan routing                       │          │
+│  │  • /api/kpi - Analytics & statistik                      │          │
+│  │  • /api/upload - Upload file/foto                        │          │
+│  │  • /ws/{user_id} - WebSocket untuk notifikasi            │          │
+│  └──────────────────────────────────────────────────────────┘          │
+│                                                                          │
+│  ┌───────────────┐  ┌──────────────┐  ┌────────────────┐              │
+│  │  AI Service   │  │     Auth     │  │    Storage     │              │
+│  │   (Gemini)    │  │   (JWT)      │  │   (Local)      │              │
+│  │               │  │              │  │                │              │
+│  │ - Klasifikasi │  │ - Hash pwd   │  │ - File upload  │              │
+│  │ - Prioritas   │  │ - Token      │  │ - Media files  │              │
+│  │ - Routing     │  │ - RBAC       │  │                │              │
+│  └───────────────┘  └──────────────┘  └────────────────┘              │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────┐          │
+│  │            BUSINESS LOGIC MODULES                         │          │
+│  │  • models.py - Pydantic schemas                          │          │
+│  │  • ai_service.py - AI classification & routing           │          │
+│  │  • auth.py - Authentication & authorization              │          │
+│  │  • storage_client.py - File storage management           │          │
+│  │  • seed.py - Database seeding                            │          │
+│  └──────────────────────────────────────────────────────────┘          │
+└──────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   │ MongoDB Driver
+                                   │
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         LAYER 3: DATABASE                                │
+│                          (MongoDB)                                       │
+│                                                                          │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐                  │
+│  │    users    │  │  departments │  │    reports   │                  │
+│  │             │  │              │  │              │                  │
+│  │ - id        │  │ - id         │  │ - id         │                  │
+│  │ - email     │  │ - name       │  │ - title      │                  │
+│  │ - role      │  │ - categories │  │ - category   │                  │
+│  │ - dept_id   │  │ - contact    │  │ - status     │                  │
+│  └─────────────┘  └──────────────┘  │ - location   │                  │
+│                                      │ - priority   │                  │
+│  ┌─────────────┐  ┌──────────────┐  │ - upvotes    │                  │
+│  │  comments   │  │ routing_rules│  └──────────────┘                  │
+│  │             │  │              │                                     │
+│  │ - report_id │  │ - category   │  ┌──────────────┐                  │
+│  │ - user_id   │  │ - dept_id    │  │notifications │                  │
+│  │ - body      │  │ - sla_hours  │  │              │                  │
+│  └─────────────┘  └──────────────┘  │ - user_id    │                  │
+│                                      │ - title/body │                  │
+│                                      │ - read       │                  │
+│                                      └──────────────┘                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│                      EXTERNAL INTEGRATIONS                               │
+│                                                                          │
+│  ┌──────────────┐     ┌─────────────────┐     ┌──────────────┐         │
+│  │  Google      │     │   Unsplash      │     │  WebSocket   │         │
+│  │  Gemini AI   │     │   (Images)      │     │  Protocol    │         │
+│  │              │     │                 │     │              │         │
+│  │ - gemini-3   │     │ - City photos   │     │ - Real-time  │         │
+│  │ - flash      │     │                 │     │ - Notif      │         │
+│  └──────────────┘     └─────────────────┘     └──────────────┘         │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+===============================================================================
+3. ALUR KERJA APLIKASI (WORKFLOW)
+===============================================================================
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│              ALUR 1: PELAPORAN MASALAH OLEH WARGA                        │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. LOGIN/REGISTER
+   └─> Warga membuat akun atau login ke sistem
+   └─> Frontend: /register atau /login
+   └─> Backend: POST /api/auth/register atau /api/auth/login
+   └─> Response: JWT token disimpan di localStorage
+
+2. BUAT LAPORAN
+   └─> Warga ke halaman "Kirim Laporan" (/submit-report)
+   └─> Input:
+       • Judul masalah
+       • Deskripsi detail
+       • Foto (opsional)
+       • Lokasi (GPS auto-detect atau manual pin di peta)
+       • Alamat
+   └─> Frontend: POST /api/reports/create
+   └─> Data dikirim ke backend termasuk base64 foto
+
+3. KLASIFIKASI AI (Backend)
+   └─> Backend menerima laporan
+   └─> Panggil ai_service.classify_report():
+       • Input: title, description, image_base64
+       • AI (Gemini) menganalisis dan return:
+         - category: "Kerusakan Jalan", "Banjir", dll
+         - urgency: "Kritis", "Tinggi", "Sedang", "Rendah"
+         - sentiment: "Darurat", "Keluhan", "Saran", "Informasi"
+         - confidence: 0-100
+         - summary: ringkasan 1 kalimat
+   └─> Jika AI gagal, gunakan fallback rule-based
+
+4. ROUTING OTOMATIS
+   └─> Berdasarkan category, tentukan department:
+       • "Kerusakan Jalan" → Dinas Pekerjaan Umum
+       • "Banjir" → Dinas Penanggulangan Bencana
+       • "Sampah" → Dinas Kebersihan
+       • dst...
+   └─> Hitung SLA deadline berdasarkan kategori
+   └─> Hitung priority_score berdasarkan urgency
+
+5. SIMPAN KE DATABASE
+   └─> Insert report ke MongoDB collection 'reports'
+   └─> Status awal: "AI Classified"
+   └─> Kirim notifikasi ke:
+       • Admin: "Laporan baru diterima"
+       • Petugas di department terkait
+
+6. REAL-TIME UPDATE
+   └─> WebSocket broadcast notifikasi
+   └─> Dashboard warga update otomatis
+
+7. KONFIRMASI
+   └─> Warga dapat melihat laporan di dashboard mereka
+   └─> Status, kategori, dan estimasi penyelesaian ditampilkan
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│             ALUR 2: PENANGANAN LAPORAN OLEH PETUGAS                      │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. PETUGAS LOGIN
+   └─> Login dengan akun officer
+   └─> Redirect ke /officer-dashboard
+
+2. LIHAT LAPORAN
+   └─> Petugas melihat laporan yang assigned ke department mereka
+   └─> Filter berdasarkan:
+       • Status
+       • Urgency
+       • Category
+   └─> Sort berdasarkan priority_score (tertinggi dulu)
+
+3. AMBIL LAPORAN (ASSIGN)
+   └─> Admin atau petugas senior assign laporan ke officer tertentu
+   └─> PUT /api/reports/{id}/assign
+   └─> Status berubah: "AI Classified" → "Assigned"
+   └─> Notifikasi ke officer yang di-assign
+
+4. MULAI BEKERJA
+   └─> Officer update status: "Assigned" → "In Progress"
+   └─> PUT /api/reports/{id}/status
+   └─> Notifikasi ke warga: "Laporan sedang ditangani"
+
+5. TAMBAH KOMENTAR
+   └─> Officer bisa menambah update/komentar
+   └─> POST /api/reports/{id}/comments
+   └─> Warga bisa melihat progress
+
+6. REVIEW
+   └─> Setelah pekerjaan selesai:
+   └─> Status: "In Progress" → "Under Review"
+   └─> Admin atau supervisor review
+
+7. SELESAI
+   └─> Status: "Under Review" → "Resolved"
+   └─> Timestamp resolved_at dicatat
+   └─> Notifikasi ke warga: "Masalah telah diselesaikan"
+
+8. TUTUP LAPORAN
+   └─> Setelah konfirmasi, status: "Resolved" → "Closed"
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│             ALUR 3: MANAJEMEN SISTEM OLEH ADMIN                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. ADMIN LOGIN
+   └─> Login dengan role: admin
+   └─> Redirect ke /admin/analytics
+
+2. DASHBOARD ANALYTICS
+   └─> GET /api/kpi
+   └─> Lihat statistik:
+       • Total reports
+       • By status (pie chart)
+       • By category (bar chart)
+       • By department
+       • Average resolution time
+       • SLA compliance rate
+       • Trend over time
+
+3. MANAJEMEN DINAS
+   └─> Halaman: /admin/departments
+   └─> CRUD departments:
+       • Buat dinas baru
+       • Edit dinas
+       • Assign categories ke dinas
+   └─> Endpoints:
+       • POST /api/departments/create
+       • GET /api/departments/all
+       • PUT /api/departments/{id}
+
+4. MANAJEMEN PETUGAS
+   └─> Halaman: /admin/officers
+   └─> CRUD officers:
+       • Tambah officer baru
+       • Assign ke department
+       • Edit profil officer
+   └─> Endpoints:
+       • GET /api/officers/all
+       • POST /api/officers/create
+       • PUT /api/officers/{id}
+
+5. ROUTING RULES
+   └─> Halaman: /admin/routing
+   └─> Atur aturan routing:
+       • Category → Department mapping
+       • SLA hours per category
+   └─> Endpoints:
+       • GET /api/routing/rules
+       • POST /api/routing/rules
+       • PUT /api/routing/rules/{id}
+
+6. MONITORING
+   └─> Monitor semua laporan real-time
+   └─> Reassign jika diperlukan
+   └─> Intervensi jika SLA terlewat
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│                  ALUR 4: FITUR INTERAKTIF                                │
+└──────────────────────────────────────────────────────────────────────────┘
+
+UPVOTING:
+└─> Warga lain bisa upvote laporan yang sama
+└─> POST /api/reports/{id}/upvote
+└─> Priority_score meningkat dengan upvote
+└─> Laporan populer mendapat perhatian lebih cepat
+
+KOMENTAR:
+└─> Warga, petugas, admin bisa berkomentar
+└─> POST /api/reports/{id}/comments
+└─> Thread diskusi untuk setiap laporan
+
+PETA INTERAKTIF:
+└─> Halaman /city-map
+└─> Tampilkan semua laporan di peta (Leaflet)
+└─> Marker berwarna berdasarkan urgency:
+    • Merah: Kritis
+    • Oranye: Tinggi
+    • Kuning: Sedang
+    • Hijau: Rendah
+└─> Klik marker untuk lihat detail
+
+NOTIFIKASI REAL-TIME:
+└─> WebSocket connection: /ws/{user_id}
+└─> Notifikasi otomatis untuk:
+    • Laporan baru (admin/officer)
+    • Status update (citizen)
+    • Assignment (officer)
+    • Komentar baru
+    • Upvote milestone
+└─> Badge count di navbar
+
+
+===============================================================================
+4. TEKNOLOGI YANG DIGUNAKAN
+===============================================================================
+
+FRONTEND:
+─────────
+• React 18.x
+  └─> Library UI: Komponen-komponen fungsional
+  └─> Hooks: useState, useEffect, useContext, useMemo
+  └─> React Router: Navigasi SPA
+
+• Tailwind CSS
+  └─> Utility-first CSS framework
+  └─> Custom config: tailwind.config.js
+  └─> Responsive design
+
+• Phosphor Icons
+  └─> Icon library modern
+
+• Leaflet / React-Leaflet
+  └─> Peta interaktif
+
+• Axios
+  └─> HTTP client untuk API calls
+
+• WebSocket API
+  └─> Real-time notifications
+
+• Context API
+  └─> State management (Auth, User)
+
+
+BACKEND:
+────────
+• FastAPI
+  └─> Modern Python web framework
+  └─> Async/await support
+  └─> Auto-generated OpenAPI docs
+
+• Python 3.11+
+  └─> Type hints
+  └─> Async programming
+
+• Motor (AsyncIOMotorClient)
+  └─> Async MongoDB driver
+
+• Pydantic
+  └─> Data validation & serialization
+  └─> Type-safe models
+
+• JWT (python-jose)
+  └─> Token-based authentication
+  └─> Secure password hashing (bcrypt)
+
+• Emergent Integrations
+  └─> LLM Chat interface untuk Gemini
+
+• Google Gemini AI (gemini-3-flash-preview)
+  └─> AI classification
+  └─> Image understanding
+  └─> Text generation
+
+• Python-multipart
+  └─> File upload handling
+
+• Supervisor
+  └─> Process manager untuk backend/frontend
+
+
+DATABASE:
+─────────
+• MongoDB
+  └─> NoSQL document database
+  └─> Collections:
+      - users
+      - departments
+      - reports
+      - comments
+      - notifications
+      - routing_rules
+  └─> Indexes untuk performance
+  └─> UUID sebagai primary key (bukan ObjectId)
+
+
+DEPLOYMENT:
+───────────
+• Docker
+  └─> Containerization
+
+• Kubernetes
+  └─> Orchestration
+  └─> Ingress routing
+
+• Supervisor
+  └─> Process control
+  └─> Auto-restart
+
+• Environment Variables
+  └─> .env files
+  └─> MONGO_URL, EMERGENT_LLM_KEY, dll
+
+
+===============================================================================
+5. STRUKTUR FOLDER DAN FILE PENTING
+===============================================================================
+
+/app/
+│
+├── backend/
+│   ├── server.py              # Main FastAPI app, semua endpoints
+│   ├── models.py              # Pydantic models (schemas)
+│   ├── auth.py                # JWT authentication & authorization
+│   ├── ai_service.py          # AI classification dengan Gemini
+│   ├── storage_client.py      # File storage management
+│   ├── seed.py                # Database seeding script
+│   ├── requirements.txt       # Python dependencies
+│   ├── .env                   # Environment variables
+│   └── tests/
+│       └── test_smartcity.py  # Unit tests
+│
+├── frontend/
+│   ├── public/
+│   │   └── index.html         # HTML template
+│   ├── src/
+│   │   ├── App.js             # Main app component + routing
+│   │   ├── index.js           # Entry point
+│   │   ├── App.css            # Global styles
+│   │   ├── index.css          # Tailwind imports
+│   │   │
+│   │   ├── pages/             # Halaman-halaman utama
+│   │   │   ├── Landing.jsx            # Landing page publik
+│   │   │   ├── Login.jsx              # Login page
+│   │   │   ├── Register.jsx           # Register page
+│   │   │   ├── CitizenDashboard.jsx   # Dashboard warga
+│   │   │   ├── OfficerDashboard.jsx   # Dashboard petugas
+│   │   │   ├── SubmitReport.jsx       # Form submit laporan
+│   │   │   ├── ReportDetail.jsx       # Detail laporan
+│   │   │   ├── CityMap.jsx            # Peta kota
+│   │   │   ├── AdminAnalytics.jsx     # Admin analytics
+│   │   │   ├── AdminDepartments.jsx   # Manajemen dinas
+│   │   │   ├── AdminOfficers.jsx      # Manajemen petugas
+│   │   │   └── AdminRouting.jsx       # Routing rules
+│   │   │
+│   │   ├── components/        # Komponen reusable
+│   │   │   ├── Layout.jsx             # Layout wrapper
+│   │   │   ├── Navbar.jsx             # Navigation bar
+│   │   │   ├── ReportCard.jsx         # Card untuk laporan
+│   │   │   ├── MapView.jsx            # Peta Leaflet
+│   │   │   ├── Badges.jsx             # Badge komponen
+│   │   │   ├── ProtectedRoute.jsx     # Route guard
+│   │   │   └── ui/                    # UI primitives
+│   │   │       ├── button.jsx
+│   │   │       ├── input.jsx
+│   │   │       ├── select.jsx
+│   │   │       └── toast.jsx
+│   │   │
+│   │   ├── lib/               # Utilities
+│   │   │   ├── api.js                 # Axios config & API calls
+│   │   │   ├── auth.jsx               # Auth context provider
+│   │   │   ├── ws.js                  # WebSocket manager
+│   │   │   └── utils.js               # Helper functions
+│   │   │
+│   │   ├── hooks/             # Custom hooks
+│   │   │   └── use-toast.js           # Toast notification hook
+│   │   │
+│   │   └── constants/         # Constants
+│   │       └── testIds/               # Test IDs untuk testing
+│   │
+│   ├── package.json           # Dependencies
+│   ├── tailwind.config.js     # Tailwind configuration
+│   ├── postcss.config.js      # PostCSS config
+│   ├── craco.config.js        # Create React App config
+│   └── .env                   # Frontend env vars
+│
+├── tests/
+│   └── __init__.py            # Test utilities
+│
+├── memory/
+│   └── test_credentials.md    # Kredensial untuk testing
+│
+├── test_reports/              # Test reports dari agent
+│
+├── test_result.md             # Testing data & communication
+│
+├── projek.txt                 # Dokumentasi ini
+│
+└── README.md                  # Project readme
+
+
+===============================================================================
+6. FITUR-FITUR UTAMA
+===============================================================================
+
+A. AUTHENTICATION & AUTHORIZATION
+   ├─ Register dengan email, nama, password
+   ├─ Login dengan JWT token
+   ├─ Role-Based Access Control (RBAC):
+   │  ├─ Citizen: Buat laporan, lihat laporan sendiri, upvote, comment
+   │  ├─ Officer: Lihat & tangani laporan, update status, comment
+   │  └─ Admin: Full access, manajemen sistem, analytics
+   └─ Protected routes dengan ProtectedRoute component
+
+B. PELAPORAN MASALAH
+   ├─ Form lengkap: title, description, photo, location, address
+   ├─ Auto-detect GPS location
+   ├─ Manual pin location di peta
+   ├─ Upload foto (multiple)
+   ├─ Preview sebelum submit
+   └─ AI auto-classification
+
+C. AI CLASSIFICATION
+   ├─ Powered by Google Gemini (gemini-3-flash-preview)
+   ├─ Analisis text + image
+   ├─ Output:
+   │  ├─ Category (11 kategori)
+   │  ├─ Urgency (4 level)
+   │  ├─ Sentiment (4 tipe)
+   │  ├─ Confidence score (0-100)
+   │  └─ Summary (ringkasan 1 kalimat)
+   ├─ Fallback ke rule-based jika AI gagal
+   └─ Validasi output untuk keamanan
+
+D. SMART ROUTING
+   ├─ Category → Department mapping
+   ├─ SLA hours per category:
+   │  ├─ Kriminalitas: 1 jam
+   │  ├─ Banjir: 2 jam
+   │  ├─ Kebocoran Air: 6 jam
+   │  ├─ Lalu Lintas: 12 jam
+   │  ├─ Sampah/Penerangan: 24 jam
+   │  ├─ Kerusakan Jalan: 48 jam
+   │  └─ Lainnya: 72 jam
+   ├─ Priority score calculation:
+   │  └─ Berdasarkan urgency + upvotes + nearby reports + confidence
+   └─ Auto-assign ke department
+
+E. DASHBOARD WARGA
+   ├─ Lihat semua laporan yang dibuat
+   ├─ Filter berdasarkan status
+   ├─ Track progress laporan
+   ├─ Klik untuk lihat detail
+   ├─ Real-time status updates
+   └─ Notifikasi center
+
+F. DASHBOARD PETUGAS
+   ├─ Lihat laporan di department mereka
+   ├─ Filter & sort:
+   │  ├─ By status
+   │  ├─ By urgency
+   │  ├─ By priority score
+   │  └─ By category
+   ├─ Ambil/assign laporan
+   ├─ Update status
+   ├─ Tambah komentar
+   └─ Real-time updates
+
+G. DASHBOARD ADMIN
+   ├─ Analytics & KPI:
+   │  ├─ Total reports
+   │  ├─ By status (chart)
+   │  ├─ By category (chart)
+   │  ├─ By department
+   │  ├─ Average resolution time
+   │  ├─ SLA compliance
+   │  └─ Trends
+   ├─ Manajemen Dinas:
+   │  ├─ CRUD departments
+   │  ├─ Assign categories
+   │  └─ Edit contact info
+   ├─ Manajemen Petugas:
+   │  ├─ CRUD officers
+   │  ├─ Assign ke department
+   │  └─ View performance
+   └─ Routing Rules:
+      ├─ Edit category mapping
+      └─ Adjust SLA hours
+
+H. PETA INTERAKTIF
+   ├─ Powered by Leaflet
+   ├─ Tampilkan semua laporan
+   ├─ Marker berwarna per urgency
+   ├─ Cluster untuk banyak marker
+   ├─ Click marker untuk detail
+   ├─ Filter di peta
+   └─ Real-time update
+
+I. VOTING & ENGAGEMENT
+   ├─ Upvote laporan
+   ├─ Upvote count visible
+   ├─ Tidak bisa upvote laporan sendiri
+   ├─ Upvote meningkatkan priority
+   └─ Nearby duplicate detection
+
+J. KOMENTAR & DISKUSI
+   ├─ Thread komentar per laporan
+   ├─ User name, role, timestamp
+   ├─ Markdown support (opsional)
+   ├─ Real-time updates
+   └─ Comment count di card
+
+K. NOTIFIKASI REAL-TIME
+   ├─ WebSocket connection persistent
+   ├─ Auto-reconnect jika disconnect
+   ├─ Notifikasi untuk:
+   │  ├─ Laporan baru (admin/officer)
+   │  ├─ Status update (citizen)
+   │  ├─ Assignment (officer)
+   │  ├─ Komentar baru
+   │  └─ Upvote
+   ├─ Badge count di navbar
+   ├─ Mark as read
+   └─ Klik untuk navigate ke laporan
+
+L. RESPONSIVE DESIGN
+   ├─ Mobile-first approach
+   ├─ Tablet & desktop optimized
+   ├─ Touch-friendly UI
+   └─ Adaptive layouts
+
+
+===============================================================================
+7. ALUR DATA (DATA FLOW)
+===============================================================================
+
+┌────────────────────────────────────────────────────────────────────────┐
+│                      COMPLETE DATA FLOW DIAGRAM                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+USER ACTION                    FRONTEND                    BACKEND                DATABASE
+─────────────                  ────────────                ───────────            ────────────
+
+[Warga Login]
+  │
+  ├─> Input email & password
+  │
+  └─> Submit form ──────────> POST /api/auth/login ────> Verify password
+                               Body: {email, password}    Compare hash
+                                                           │
+                                                           └─> Valid? ──────> Query users
+                                                                              collection
+                                                           
+                               <──── Response: ───────────┘
+                               {token, user}              Generate JWT
+                               
+      Store token in localStorage
+      Set auth context
+      Redirect to dashboard
+
+
+[Submit Laporan]
+  │
+  ├─> Fill form (title, desc, photo, location)
+  │
+  ├─> Get GPS coordinates
+  │
+  └─> Submit ──────────────> POST /api/reports/create ──> Upload photo
+                              Body: {                       to storage
+                                title,                      │
+                                description,                ├─> Classify via AI
+                                category (opt),             │   classify_report()
+                                latitude,                   │   └─> Call Gemini
+                                longitude,                  │       with text + image
+                                address,                    │
+                                media_urls,                 │   <─── AI Response:
+                                image_base64                │       {category, urgency,
+                              }                             │        sentiment, 
+                                                            │        confidence, summary}
+                                                            │
+                                                            ├─> Route to department
+                                                            │   route_to_department()
+                                                            │
+                                                            ├─> Calculate SLA
+                                                            │   deadline
+                                                            │
+                                                            ├─> Calculate priority
+                                                            │   calculate_priority_score()
+                                                            │
+                                                            └─> Save report ────> Insert into
+                                                                                  reports
+                                                                                  collection
+                              <──── Response: ────────────┘
+                              {report object}             Create notifications
+                                                           │
+                                                           └─> Broadcast via ──> Insert into
+                                                               WebSocket        notifications
+                                                                                collection
+      Show success message
+      Redirect to dashboard
+
+
+[Officer Update Status]
+  │
+  ├─> Click "Update Status"
+  │
+  ├─> Select new status
+  │
+  └─> Submit ──────────────> PUT /api/reports/{id}/status ─> Validate officer
+                              Body: {                           has permission
+                                status,                         │
+                                note                            ├─> Update report ──> Update
+                              }                                 │                      reports
+                                                                │                      collection
+                                                                │
+                                                                ├─> Create notif
+                                                                │   for citizen
+                                                                │
+                                                                └─> Broadcast ────> Insert notif
+                              
+                              <──── Response: ────────────┘
+                              {updated report}
+      
+      Update UI
+      Show toast notification
+
+
+[Admin View Analytics]
+  │
+  ├─> Navigate to /admin/analytics
+  │
+  └─> Page load ───────────> GET /api/kpi ───────────────> Aggregate from ──> Query reports
+                                                            reports:             collection
+                                                            - Count by status    with aggregation
+                                                            - Count by category  pipeline
+                                                            - Avg resolution time
+                                                            - SLA compliance
+                              
+                              <──── Response: ────────────┘
+                              {
+                                total,
+                                by_status: {},
+                                by_category: {},
+                                avg_resolution_mins,
+                                sla_compliance_pct,
+                                ...
+                              }
+      
+      Render charts
+      Display KPIs
+
+
+[WebSocket Real-time Notification]
+
+  Connection established ──> WS /ws/{user_id} ───────────> Accept connection
+      │                                                     Add to active
+      │                                                     connections
+      │                                                     manager.connect()
+      │
+      │     <────────────────── Push notification ────────┐
+      │     {                                              │
+      │       type: "report_update",                       │ (When event happens)
+      │       data: {...}                                  │ manager.send()
+      │     }                                              │
+      │                                                     │
+      └─> Display toast notification                       │
+          Update badge count                               │
+          Update dashboard                                 │
+
+
+===============================================================================
+8. KATEGORI DAN DEPARTEMEN (INDONESIA)
+===============================================================================
+
+┌───────────────────────────────────────────────────────────────────────┐
+│  KATEGORI             │  DINAS TERKAIT                   │  SLA      │
+├───────────────────────────────────────────────────────────────────────┤
+│  Kerusakan Jalan      │  Dinas Pekerjaan Umum            │  48 jam   │
+│  Banjir               │  Dinas Penanggulangan Bencana    │   2 jam   │
+│  Sampah               │  Dinas Kebersihan                │  24 jam   │
+│  Lalu Lintas          │  Dinas Perhubungan               │  12 jam   │
+│  Penerangan Jalan     │  Dinas Infrastruktur Listrik     │  24 jam   │
+│  Kebocoran Air        │  Dinas Air Bersih                │   6 jam   │
+│  Kriminalitas         │  Dinas Keamanan Publik           │   1 jam   │
+│  Vandalisme           │  Dinas Keamanan Publik           │  48 jam   │
+│  Kerusakan Fasilitas  │  Dinas Pekerjaan Umum            │  72 jam   │
+│  Masalah Lingkungan   │  Dinas Lingkungan Hidup          │  48 jam   │
+│  Lainnya              │  Dinas Umum                      │  72 jam   │
+└───────────────────────────────────────────────────────────────────────┘
+
+
+===============================================================================
+9. STATUS LAPORAN (LIFECYCLE)
+===============================================================================
+
+  1. Submitted          →  Laporan baru diterima sistem
+  2. AI Classified      →  AI selesai klasifikasi, siap di-assign
+  3. Assigned           →  Ditugaskan ke officer tertentu
+  4. In Progress        →  Officer sedang mengerjakan
+  5. Under Review       →  Pekerjaan selesai, menunggu review
+  6. Resolved           →  Masalah telah diselesaikan
+  7. Closed             →  Laporan ditutup (final state)
+
+
+===============================================================================
+10. API ENDPOINTS LENGKAP
+===============================================================================
+
+AUTH:
+─────
+POST   /api/auth/register        Register user baru
+POST   /api/auth/login           Login dan dapatkan token
+GET    /api/auth/me              Get current user info
+POST   /api/auth/seed            Seed database (dev only)
+
+REPORTS:
+────────
+POST   /api/reports/create       Buat laporan baru
+GET    /api/reports/all          List semua laporan (with filters)
+GET    /api/reports/my           Laporan user yang login
+GET    /api/reports/{id}         Detail satu laporan
+PUT    /api/reports/{id}/status  Update status laporan
+PUT    /api/reports/{id}/assign  Assign ke officer
+POST   /api/reports/{id}/upvote  Upvote laporan
+DELETE /api/reports/{id}/upvote  Remove upvote
+POST   /api/reports/{id}/comments Create comment
+GET    /api/reports/{id}/comments Get all comments
+
+DEPARTMENTS:
+────────────
+POST   /api/departments/create   Buat department baru (admin)
+GET    /api/departments/all      List semua departments
+PUT    /api/departments/{id}     Update department (admin)
+DELETE /api/departments/{id}     Delete department (admin)
+
+OFFICERS:
+─────────
+GET    /api/officers/all         List semua officers (admin)
+POST   /api/officers/create      Buat officer baru (admin)
+PUT    /api/officers/{id}        Update officer (admin)
+
+ROUTING RULES:
+──────────────
+GET    /api/routing/rules        List semua routing rules
+POST   /api/routing/rules        Create new rule (admin)
+PUT    /api/routing/rules/{id}   Update rule (admin)
+DELETE /api/routing/rules/{id}   Delete rule (admin)
+
+NOTIFICATIONS:
+──────────────
+GET    /api/notifications        Get user notifications
+PUT    /api/notifications/{id}/read  Mark as read
+
+KPI & ANALYTICS:
+────────────────
+GET    /api/kpi                  Get analytics data (admin)
+
+UPLOAD:
+───────
+POST   /api/upload               Upload file/foto
+
+WEBSOCKET:
+──────────
+WS     /ws/{user_id}             WebSocket connection untuk real-time
+
+
+===============================================================================
+11. ENVIRONMENT VARIABLES
+===============================================================================
+
+BACKEND (.env):
+───────────────
+MONGO_URL=mongodb://localhost:27017/smartcity
+DB_NAME=smartcity
+JWT_SECRET=your-secret-key-here
+GEMINI_API_KEY=your-gemini-api-key  (optional)
+EMERGENT_LLM_KEY=your-emergent-key  (universal key)
+STORAGE_PATH=/app/backend/storage
+
+FRONTEND (.env):
+────────────────
+REACT_APP_BACKEND_URL=http://your-backend-url/api
+REACT_APP_WS_URL=ws://your-backend-url/ws
+
+
+===============================================================================
+12. DEFAULT USERS (SEEDED)
+===============================================================================
+
+ADMIN:
+──────
+Email: admin@kotapintar.id
+Password: Admin@12345
+Role: admin
+
+DEMO WARGA:
+───────────
+Email: warga@kotapintar.id
+Password: Warga@123
+Role: citizen
+
+PETUGAS (10 officers):
+──────────────────────
+Email: petugas1@kotapintar.id sampai petugas10@kotapintar.id
+Password: Petugas@123
+Role: officer
+
+WARGA (20 citizens):
+────────────────────
+Email: warga1@contoh.com sampai warga20@contoh.com
+Password: Warga@123
+Role: citizen
+
+
+===============================================================================
+13. LOKASI DEFAULT (JAKARTA)
+===============================================================================
+
+Koordinat Pusat: -6.2088, 106.8456 (Jakarta, Indonesia)
+
+Sample Alamat:
+──────────────
+- Jl. Sudirman, Jakarta Selatan
+- Jl. Thamrin, Jakarta Pusat
+- Jl. Gatot Subroto, Kuningan
+- Jl. Asia Afrika, Senayan
+- Jl. Casablanca, Tebet
+- Jl. HR Rasuna Said, Setiabudi
+- Jl. Sisingamangaraja, Kebayoran Baru
+- Jl. Supomo, Menteng
+- Jl. Mampang Prapatan
+- Jl. MT Haryono, Cawang
+
+
+===============================================================================
+14. TESTING
+===============================================================================
+
+Backend Tests:
+──────────────
+Location: /app/backend/tests/test_smartcity.py
+Run: pytest backend/tests/
+
+Test Coverage:
+- Authentication (register, login)
+- Report creation
+- AI classification
+- Routing logic
+- Status updates
+- Upvoting
+- Comments
+- Notifications
+
+Frontend Testing:
+─────────────────
+Manual testing atau bisa tambahkan:
+- Jest untuk unit tests
+- React Testing Library
+- Playwright untuk E2E
+
+Test IDs sudah disediakan di components untuk automation.
+
+
+===============================================================================
+15. DEPLOYMENT CHECKLIST
+===============================================================================
+
+□ Set environment variables dengan benar
+□ Pastikan MONGO_URL terhubung
+□ Set EMERGENT_LLM_KEY atau GEMINI_API_KEY
+□ Build frontend: yarn build
+□ Install backend dependencies: pip install -r requirements.txt
+□ Seed database: POST /api/auth/seed
+□ Start backend via supervisor
+□ Start frontend via supervisor
+□ Check services: sudo supervisorctl status all
+□ Test WebSocket connection
+□ Verify file upload path exists
+□ Check CORS settings
+□ Test all API endpoints
+□ Verify real-time notifications
+□ Load test dengan multiple users
+
+
+===============================================================================
+16. TROUBLESHOOTING
+===============================================================================
+
+Issue: Backend tidak start
+Solution:
+- Check logs: tail -f /var/log/supervisor/backend.err.log
+- Verify MONGO_URL
+- Pastikan semua dependencies terinstall
+- Check port 8001 tidak digunakan
+
+Issue: Frontend tidak connect ke backend
+Solution:
+- Verify REACT_APP_BACKEND_URL di .env
+- Pastikan backend running
+- Check CORS settings di backend
+- Inspect network tab di browser
+
+Issue: AI classification gagal
+Solution:
+- Check EMERGENT_LLM_KEY atau GEMINI_API_KEY
+- Verify API key valid
+- Check logs untuk error message
+- Fallback akan otomatis ke rule-based
+
+Issue: WebSocket disconnect
+Solution:
+- Check network connection
+- Verify WebSocket URL
+- Check browser console untuk errors
+- Auto-reconnect seharusnya handle ini
+
+Issue: File upload gagal
+Solution:
+- Check STORAGE_PATH exists dan writable
+- Verify file size limits
+- Check disk space
+- Inspect backend logs
+
+
+===============================================================================
+17. FUTURE ENHANCEMENTS (ROADMAP)
+===============================================================================
+
+Phase 1 (Current): ✅ COMPLETE
+- Basic reporting system
+- AI classification
+- Smart routing
+- Dashboards
+- Real-time notifications
+- Map view
+- Analytics
+
+Phase 2 (Planned):
+- [ ] Mobile app (React Native)
+- [ ] Push notifications (FCM)
+- [ ] Email notifications
+- [ ] SMS alerts untuk urgent reports
+- [ ] PDF report export
+- [ ] Advanced analytics (ML-based predictions)
+- [ ] Citizen reputation system
+- [ ] Gamification (badges, leaderboards)
+
+Phase 3 (Future):
+- [ ] Multi-language support
+- [ ] Voice report submission
+- [ ] AI-powered chatbot
+- [ ] Integration dengan sistem pemerintah lain
+- [ ] Public API untuk third-party
+- [ ] Advanced search & filters
+- [ ] Report trends & insights
+- [ ] Automated response untuk common issues
+
+
+===============================================================================
+18. MAINTENANCE & MONITORING
+===============================================================================
+
+Regular Tasks:
+──────────────
+- Monitor MongoDB disk usage
+- Check error logs daily
+- Review slow API endpoints
+- Update dependencies monthly
+- Backup database weekly
+- Test AI classification accuracy
+- Monitor SLA compliance rates
+- Review user feedback
+
+Monitoring Metrics:
+───────────────────
+- Average response time per endpoint
+- AI classification accuracy
+- SLA compliance percentage
+- Average resolution time
+- User engagement (daily active users)
+- Reports per day/week/month
+- Department performance
+- Officer workload distribution
+
+
+===============================================================================
+19. CONTACT & SUPPORT
+===============================================================================
+
+Untuk pertanyaan teknis atau bantuan:
+
+Project Location: /app/
+Documentation: /app/projek.txt (file ini)
+Test Results: /app/test_result.md
+Test Credentials: /app/memory/test_credentials.md
+
+
+===============================================================================
+20. KESIMPULAN
+===============================================================================
+
+Aplikasi Kota Pintar adalah solusi lengkap untuk manajemen pelaporan masalah
+publik berbasis AI. Sistem ini menggabungkan teknologi modern (React, FastAPI,
+MongoDB, Gemini AI) untuk menciptakan pengalaman yang seamless bagi warga,
+petugas, dan administrator.
+
+Key Highlights:
+✅ AI-powered classification & routing
+✅ Real-time updates via WebSocket
+✅ Comprehensive dashboards untuk semua user roles
+✅ Interactive map visualization
+✅ Mobile-responsive design
+✅ Scalable architecture
+✅ Full Indonesian localization
+
+Aplikasi ini ready untuk production dan dapat di-scale sesuai kebutuhan kota.
+
+===============================================================================
+                              END OF DOCUMENTATION
+===============================================================================
+Terakhir diperbarui: 2025
+Version: 1.0

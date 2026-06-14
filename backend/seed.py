@@ -10,8 +10,8 @@ def utc_now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 
-# Cities of mock coordinates (centered on a city — using New Delhi as anchor)
-CENTER_LAT, CENTER_LON = 28.6139, 77.2090
+# Cities of mock coordinates (centered on Jakarta, Indonesia)
+CENTER_LAT, CENTER_LON = -6.2088, 106.8456
 
 
 def random_coords(radius_km: float = 8):
@@ -23,44 +23,45 @@ def random_coords(radius_km: float = 8):
 
 
 SAMPLE_REPORTS = [
-    ("Massive pothole on MG Road causing accidents", "There's a deep crater forming after recent rains. Two bikes have already crashed today.", "Road Damage", "High"),
-    ("Overflowing garbage bin near market", "The community bin hasn't been emptied for 5 days. Stray dogs scatter the trash.", "Garbage", "Medium"),
-    ("Broken street light on Sector 21", "Three consecutive lights are out. The whole stretch is pitch dark at night.", "Public Lighting", "High"),
-    ("Severe waterlogging after heavy rains", "Water has risen knee-deep in the entire colony, residents stranded.", "Flood", "Critical"),
-    ("Burst water main flooding the street", "Pipe ruptured this morning, water flowing for hours.", "Water Leak", "Critical"),
-    ("Suspicious activity near park gate", "A group has been intimidating evening walkers for days.", "Crime", "High"),
-    ("Traffic signal not working at junction", "Major intersection has no working signal for over a day.", "Traffic", "High"),
-    ("Graffiti on school wall", "Inappropriate graffiti painted overnight on school boundary.", "Vandalism", "Low"),
-    ("Public toilet damaged and unusable", "The community toilet has broken doors and no water supply.", "Public Facility Damage", "Medium"),
-    ("Illegal garbage dumping along river", "Trucks dumping construction waste into the river daily.", "Environmental Issue", "High"),
-    ("Pothole on highway service road", "Multiple potholes appeared after last week's rain.", "Road Damage", "Medium"),
-    ("Garbage piling up at bus stop", "Commuters have to step over trash.", "Garbage", "Low"),
-    ("Street light flickering all night", "Constant flickering disturbing residents.", "Public Lighting", "Low"),
-    ("Drainage clogged causing minor flooding", "Stormwater drain blocked.", "Flood", "Medium"),
-    ("Slow water leak from public tap", "Minor leak wasting water continuously.", "Water Leak", "Low"),
-    ("Vandalism in city park", "Benches have been spray-painted.", "Vandalism", "Low"),
-    ("Heavy traffic at school zone", "Daily peak-hour congestion endangering kids.", "Traffic", "Medium"),
-    ("Damaged playground equipment", "Slide is cracked and unsafe for children.", "Public Facility Damage", "High"),
-    ("Smoke from burning garbage", "Open burning of waste creating health hazard.", "Environmental Issue", "Medium"),
-    ("Cracked sidewalk near hospital", "Elderly patients struggling to walk safely.", "Road Damage", "Medium"),
+    ("Lubang besar di Jalan Sudirman menyebabkan kecelakaan", "Ada lubang besar yang terbentuk setelah hujan deras. Dua motor sudah terperosok hari ini.", "Kerusakan Jalan", "Tinggi"),
+    ("Tong sampah meluap di dekat pasar", "Tong sampah sudah tidak dikosongkan selama 5 hari. Anjing liar membuang sampah berserakan.", "Sampah", "Sedang"),
+    ("Lampu jalan mati di Kelurahan Menteng", "Tiga lampu berturut-turut mati. Seluruh jalan gelap gulita di malam hari.", "Penerangan Jalan", "Tinggi"),
+    ("Genangan air parah setelah hujan deras", "Air sudah setinggi lutut di seluruh kompleks, warga terisolasi.", "Banjir", "Kritis"),
+    ("Pipa air utama pecah dan membanjiri jalan", "Pipa pecah pagi ini, air mengalir berjam-jam.", "Kebocoran Air", "Kritis"),
+    ("Aktivitas mencurigakan di dekat gerbang taman", "Sekelompok orang mengintimidasi pengunjung taman selama berhari-hari.", "Kriminalitas", "Tinggi"),
+    ("Lampu lalu lintas tidak berfungsi di persimpangan", "Persimpangan besar tidak ada lampu yang menyala sudah satu hari.", "Lalu Lintas", "Tinggi"),
+    ("Coretan di dinding sekolah", "Coretan tidak pantas dibuat semalam di pagar sekolah.", "Vandalisme", "Rendah"),
+    ("Toilet umum rusak dan tidak bisa digunakan", "Toilet umum pintunya rusak dan tidak ada air.", "Kerusakan Fasilitas Umum", "Sedang"),
+    ("Pembuangan sampah ilegal di bantaran sungai", "Truk membuang sampah konstruksi ke sungai setiap hari.", "Masalah Lingkungan", "Tinggi"),
+    ("Lubang di jalan tol layanan", "Beberapa lubang muncul setelah hujan minggu lalu.", "Kerusakan Jalan", "Sedang"),
+    ("Sampah menumpuk di halte bus", "Para penumpang harus melangkahi sampah.", "Sampah", "Rendah"),
+    ("Lampu jalan berkedip sepanjang malam", "Kedipan terus menerus mengganggu warga.", "Penerangan Jalan", "Rendah"),
+    ("Saluran tersumbat menyebabkan banjir kecil", "Saluran air hujan tersumbat.", "Banjir", "Sedang"),
+    ("Kebocoran air kecil dari keran umum", "Kebocoran kecil terus menerus membuang air.", "Kebocoran Air", "Rendah"),
+    ("Vandalisme di taman kota", "Bangku-bangku disemprot cat.", "Vandalisme", "Rendah"),
+    ("Lalu lintas padat di zona sekolah", "Kemacetan jam sibuk membahayakan anak-anak.", "Lalu Lintas", "Sedang"),
+    ("Peralatan taman bermain rusak", "Perosotan retak dan tidak aman untuk anak-anak.", "Kerusakan Fasilitas Umum", "Tinggi"),
+    ("Asap dari pembakaran sampah", "Pembakaran sampah terbuka menciptakan bahaya kesehatan.", "Masalah Lingkungan", "Sedang"),
+    ("Trotoar retak di dekat rumah sakit", "Pasien lansia kesulitan berjalan dengan aman.", "Kerusakan Jalan", "Sedang"),
 ]
 
 CITIZEN_NAMES = [
-    "Aarav Sharma", "Priya Patel", "Rohan Verma", "Sneha Reddy", "Karan Singh",
-    "Anjali Mehta", "Vikram Iyer", "Pooja Nair", "Aditya Kumar", "Riya Joshi",
-    "Arjun Desai", "Kavya Rao", "Manish Gupta", "Ishita Bose", "Siddharth Roy",
-    "Meera Pillai", "Nikhil Khanna", "Tanvi Shah", "Dev Malhotra", "Naina Chopra",
+    "Budi Santoso", "Siti Nurhaliza", "Ahmad Dhani", "Rina Pratiwi", "Dedi Susanto",
+    "Maya Sari", "Eko Prabowo", "Fitri Handayani", "Hendra Gunawan", "Lia Amalia",
+    "Agus Wijaya", "Dewi Lestari", "Bambang Suryanto", "Citra Kirana", "Fauzi Rahman",
+    "Indah Permata", "Joko Widodo", "Kartika Putri", "Lukman Hakim", "Nisa Sabrina",
 ]
 
 OFFICER_NAMES = [
-    "Rajesh Kumar", "Sunita Devi", "Amit Verma", "Geeta Singh", "Vinod Yadav",
-    "Lakshmi Iyer", "Prakash Joshi", "Anita Rao", "Suresh Patel", "Deepa Nair",
+    "Bambang Hermanto", "Sri Wahyuni", "Imam Santoso", "Retno Wulandari", "Agung Prasetyo",
+    "Lestari Rahayu", "Dwi Atmojo", "Yuni Astuti", "Sugeng Riyadi", "Dian Pertiwi",
 ]
 
 ADDRESSES = [
-    "MG Road, Sector 18", "Connaught Place", "Karol Bagh Market", "Lajpat Nagar",
-    "Saket District Centre", "Nehru Place", "Hauz Khas Village", "Greater Kailash",
-    "Dwarka Sector 21", "Rohini Sector 11",
+    "Jl. Sudirman, Jakarta Selatan", "Jl. Thamrin, Jakarta Pusat", "Jl. Gatot Subroto, Kuningan",
+    "Jl. Asia Afrika, Senayan", "Jl. Casablanca, Tebet", "Jl. HR Rasuna Said, Setiabudi",
+    "Jl. Sisingamangaraja, Kebayoran Baru", "Jl. Supomo, Menteng", "Jl. Mampang Prapatan",
+    "Jl. MT Haryono, Cawang",
 ]
 
 
@@ -72,8 +73,8 @@ async def seed_all(db):
         d = {
             "id": _id(),
             "name": name,
-            "description": f"{name} of the city government",
-            "contact_email": f"{name.lower().replace(' ', '.')}@city.gov",
+            "description": f"{name} Pemerintah Kota",
+            "contact_email": f"{name.lower().replace(' ', '.')}@kotapintar.id",
             "categories": [c for c, dn in DEFAULT_ROUTING.items() if dn == name],
             "created_at": utc_now_iso(),
         }
@@ -95,11 +96,11 @@ async def seed_all(db):
     # 3) Admin (single)
     admin = {
         "id": _id(),
-        "name": "City Admin",
-        "email": "admin@smartcity.gov",
+        "name": "Admin Kota",
+        "email": "admin@kotapintar.id",
         "password_hash": hash_password("Admin@12345"),
         "role": "admin",
-        "phone": "+91-9999900001",
+        "phone": "+62-811-9999-0001",
         "department_id": None,
         "avatar_url": None,
         "created_at": utc_now_iso(),
@@ -113,10 +114,10 @@ async def seed_all(db):
         o = {
             "id": _id(),
             "name": oname,
-            "email": f"officer{i+1}@smartcity.gov",
-            "password_hash": hash_password("Officer@123"),
+            "email": f"petugas{i+1}@kotapintar.id",
+            "password_hash": hash_password("Petugas@123"),
             "role": "officer",
-            "phone": f"+91-99999{1000+i:04d}",
+            "phone": f"+62-812-9999-{1000+i:04d}",
             "department_id": dept["id"],
             "avatar_url": None,
             "created_at": utc_now_iso(),
@@ -128,11 +129,11 @@ async def seed_all(db):
     citizens = []
     demo_citizen = {
         "id": _id(),
-        "name": "Demo Citizen",
-        "email": "citizen@smartcity.gov",
-        "password_hash": hash_password("Citizen@123"),
+        "name": "Demo Warga",
+        "email": "warga@kotapintar.id",
+        "password_hash": hash_password("Warga@123"),
         "role": "citizen",
-        "phone": "+91-9000000000",
+        "phone": "+62-813-0000-0000",
         "department_id": None,
         "avatar_url": None,
         "created_at": utc_now_iso(),
@@ -143,10 +144,10 @@ async def seed_all(db):
         c = {
             "id": _id(),
             "name": cname,
-            "email": f"citizen{i+1}@example.com",
-            "password_hash": hash_password("Citizen@123"),
+            "email": f"warga{i+1}@contoh.com",
+            "password_hash": hash_password("Warga@123"),
             "role": "citizen",
-            "phone": f"+91-98765{4000+i:04d}",
+            "phone": f"+62-821-8765-{4000+i:04d}",
             "department_id": None,
             "avatar_url": None,
             "created_at": utc_now_iso(),
@@ -165,18 +166,18 @@ async def seed_all(db):
         dept = dept_by_name.get(DEFAULT_ROUTING.get(category, "General Affairs Department"))
         # ensure dept exists
         if not dept:
-            dept = await db.departments.find_one({"name": "General Affairs Department"}, {"_id": 0})
+            dept = await db.departments.find_one({"name": "Dinas Umum"}, {"_id": 0})
             if not dept:
                 dept = {
                     "id": _id(),
-                    "name": "General Affairs Department",
-                    "description": "Catch-all department",
-                    "contact_email": "general@city.gov",
+                    "name": "Dinas Umum",
+                    "description": "Dinas untuk semua keperluan umum",
+                    "contact_email": "umum@kotapintar.id",
                     "categories": [],
                     "created_at": utc_now_iso(),
                 }
                 await db.departments.insert_one(dept)
-                dept_by_name["General Affairs Department"] = dept
+                dept_by_name["Dinas Umum"] = dept
         sla_h = SLA_HOURS.get(category, 48)
         days_ago = random.randint(0, 25)
         created = now - timedelta(days=days_ago, hours=random.randint(0, 23))
@@ -199,7 +200,7 @@ async def seed_all(db):
             "description": desc,
             "category": category,
             "urgency": urgency,
-            "sentiment": random.choice(["Complaint", "Emergency", "Information"]),
+            "sentiment": random.choice(["Keluhan", "Darurat", "Informasi"]),
             "confidence": confidence,
             "summary": (desc[:180] + ".") if desc else title,
             "status": status,

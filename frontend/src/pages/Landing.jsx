@@ -12,15 +12,15 @@ export default function Landing() {
                         <div className="lg:col-span-7 animate-fade-up">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-border mb-6">
                                 <Lightning size={14} weight="fill" className="text-brand-warning" />
-                                <span className="label-mono text-[10px]">AI-powered civic dispatcher</span>
+                                <span className="label-mono text-[10px]">Dispatcher publik bertenaga AI</span>
                             </div>
                             <h1 className="font-heading text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[0.95] mb-6">
-                                Report a problem.<br />
-                                <span className="text-primary">Watch the city respond.</span>
+                                Laporkan masalah.<br />
+                                <span className="text-primary">Lihat kota merespons.</span>
                             </h1>
                             <p className="text-lg text-muted-foreground max-w-xl mb-8 leading-relaxed">
-                                Citizens submit issues — potholes, floods, broken lights, garbage. Our AI classifies, prioritizes,
-                                and routes each report to the right city department in seconds.
+                                Warga melaporkan masalah — lubang jalan, banjir, lampu rusak, sampah. AI kami mengklasifikasi, memprioritaskan,
+                                dan merutekan setiap laporan ke dinas kota yang tepat dalam hitungan detik.
                             </p>
                             <div className="flex flex-wrap items-center gap-3">
                                 <Link
@@ -28,7 +28,7 @@ export default function Landing() {
                                     data-testid="landing-get-started-btn"
                                     className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 active:scale-95 transition"
                                 >
-                                    Get started
+                                    Mulai Sekarang
                                     <span className="font-mono">→</span>
                                 </Link>
                                 <Link
@@ -36,21 +36,21 @@ export default function Landing() {
                                     data-testid="landing-signin-btn"
                                     className="inline-flex items-center gap-2 px-6 py-3 rounded-md border border-border bg-white font-semibold hover:bg-muted transition"
                                 >
-                                    Sign in
+                                    Masuk
                                 </Link>
                             </div>
                             <div className="mt-10 grid grid-cols-3 max-w-md gap-6">
                                 <div>
                                     <div className="font-heading text-3xl font-semibold">7</div>
-                                    <div className="label-mono">stages</div>
+                                    <div className="label-mono">tahapan</div>
                                 </div>
                                 <div>
                                     <div className="font-heading text-3xl font-semibold text-brand-success">10</div>
-                                    <div className="label-mono">departments</div>
+                                    <div className="label-mono">dinas</div>
                                 </div>
                                 <div>
-                                    <div className="font-heading text-3xl font-semibold text-brand-warning">{"<2h"}</div>
-                                    <div className="label-mono">SLA flood</div>
+                                    <div className="font-heading text-3xl font-semibold text-brand-warning">{"<2j"}</div>
+                                    <div className="label-mono">SLA banjir</div>
                                 </div>
                             </div>
                         </div>
@@ -65,13 +65,13 @@ export default function Landing() {
                                 <div className="absolute -bottom-6 -left-6 bg-white border border-border rounded-lg shadow-lg p-4 w-64 animate-fade-up">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-2 h-2 rounded-full bg-brand-danger animate-pulse-soft" />
-                                        <span className="label-mono text-[9px]">Live · just now</span>
+                                        <span className="label-mono text-[9px]">Langsung · baru saja</span>
                                     </div>
-                                    <div className="font-heading font-semibold text-sm">Pothole on MG Road</div>
-                                    <div className="text-xs text-muted-foreground mt-1">→ Public Works Dept · Auto-assigned</div>
+                                    <div className="font-heading font-semibold text-sm">Lubang di Jl. Sudirman</div>
+                                    <div className="text-xs text-muted-foreground mt-1">→ Dinas Pekerjaan Umum · Otomatis</div>
                                 </div>
                                 <div className="absolute -top-4 -right-4 bg-primary text-white rounded-lg shadow-lg px-4 py-3 animate-fade-up">
-                                    <div className="label-mono text-[9px] text-white/70">AI confidence</div>
+                                    <div className="label-mono text-[9px] text-white/70">Kepercayaan AI</div>
                                     <div className="font-mono font-semibold text-2xl">92%</div>
                                 </div>
                             </div>
@@ -82,9 +82,9 @@ export default function Landing() {
                 <section className="max-w-[1400px] mx-auto px-4 md:px-8 pb-24">
                     <div className="grid md:grid-cols-3 gap-6">
                         {[
-                            { icon: Camera, title: "Snap & submit", desc: "Photo, location, description. AI handles category & urgency." },
-                            { icon: FlowArrow, title: "Smart routing", desc: "Issue goes to the right department with priority score & SLA." },
-                            { icon: ChartLineUp, title: "Live tracking", desc: "Citizens, officers, and admins see real-time progress." },
+                            { icon: Camera, title: "Foto & kirim", desc: "Foto, lokasi, deskripsi. AI menangani kategori & urgensi." },
+                            { icon: FlowArrow, title: "Rute pintar", desc: "Masalah dikirim ke dinas yang tepat dengan skor prioritas & SLA." },
+                            { icon: ChartLineUp, title: "Pelacakan real-time", desc: "Warga, petugas, dan admin melihat progres secara langsung." },
                         ].map((f, i) => (
                             <div key={i} className="bg-white border border-border rounded-lg p-6 hover:-translate-y-1 hover:shadow-md transition-all">
                                 <f.icon size={28} weight="duotone" className="text-primary mb-3" />
