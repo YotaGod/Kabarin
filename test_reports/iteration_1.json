@@ -1,0 +1,52 @@
+{
+  "summary": "Comprehensive backend (29 pytest tests) + frontend (admin, officer, citizen, map, notifications) testing of Smart City app. 28/29 backend tests pass (96.5%). All major frontend flows render and integrate correctly. AI classification preview and report creation via API work. The only backend failure is a seed/spec mismatch (9 unique departments vs spec's 10) and a few minor frontend findings.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/departments (seed)", "issue": "Seed creates only 9 unique departments (DEFAULT_ROUTING.values() dedupes to 9). Spec/PRD requests 10. Either update spec text or extend DEFAULT_ROUTING/seed to produce 10 distinct departments."},
+      {"endpoint": "/api/ws (WebSocket)", "issue": "WS connections are immediately closed via the preview ingress ('WebSocket is closed before the connection is established'). Real-time updates therefore not delivered to clients in preview environment. Likely ingress proxy_pass for /api/ws is not configured for upgrade, or backend disconnects when client doesn't send messages. Verify ingress WS support or use SSE fallback."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "OfficerDashboard queue row", "issue": "Clicking on a queue row (outside the title link) does not navigate to /reports/{id}. Only the title <Link> is clickable. Consider making the whole row clickable for better UX.", "selector": "tbody tr", "priority": "LOW"},
+      {"component": "SubmitReport", "issue": "No explicit lat/lng inputs are exposed; lat/lng is only set via map click or 'Use my location' (browser geolocation). In headless/desktop without permission, the form can be filled with all fields and submit is enabled but submission silently fails (no toast/error visible). Add a visible numeric lat/lng input fallback or block submit until coords set with a clear error.", "selector": "[data-testid=\"submit-report-btn\"]", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [
+      {"flow": "WebSocket realtime", "issue": "All pages attempt WS connection; the connection is rejected by ingress. App still works (REST falls back), but realtime events (new report broadcast, status update, notifications) won't reach the browser.", "affected_selectors": ["[data-testid=\"notifications-btn\"]"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_smartcity.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Either reword PRD ('9 departments') or extend DEFAULT_ROUTING (in /app/backend/ai_service.py) so seed produces 10 unique departments.",
+    "Investigate WebSocket failure via the k8s/nginx ingress (wss://.../api/ws closes immediately). Confirm upgrade headers are forwarded; otherwise document that realtime updates rely on polling.",
+    "SubmitReport: expose visible lat/lng inputs OR disable submit button until lat/lng set and show a clear error toast when geolocation is denied / coords missing.",
+    "OfficerDashboard: make full queue row clickable to navigate to /reports/{id} (minor UX)."
+  ],
+  "critical_code_review_comments": [
+    "server.py is ~930 lines — consider splitting routes into modules (auth, reports, analytics, uploads, admin).",
+    "Seed runs only when users collection is empty (good). Idempotent. Passwords hashed with bcrypt. JWT uses HS256.",
+    "create_report awaits AI classification on every POST — if Gemini is slow this blocks the request; consider returning quickly with status=Submitted and classifying in background.",
+    "count_nearby_duplicates and /reports/check-duplicate iterate all open reports in Python — fine at current scale but should use a geo index ($near) for production.",
+    "GET /api/files/{path}?auth={token} accepts JWT in query string — token will be logged by proxies/CDN. Acceptable for short-lived URLs but consider signed URLs.",
+    "Frontend uses `process.env.REACT_APP_BACKEND_URL` everywhere — good. data-testid coverage is solid."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_smartcity.py (new)",
+    "/app/backend/tests/conftest.py (new)",
+    "/app/backend/tests/__init__.py (new)",
+    "/app/memory/test_credentials.md (updated)"
+  ],
+  "success_rate": {"backend": "96.5% (28/29)", "frontend": "~90% (all major flows render; minor UX gaps and WS not testable)"},
+  "test_credentials": "Admin: admin@smartcity.gov / Admin@12345; Officer: officer1@smartcity.gov / Officer@123; Citizen: citizen@smartcity.gov / Citizen@123",
+  "seed_data_creation": "Auto-seeded by backend on first start. Pytest also created a few TEST_ reports/comments via citizen account (not cleaned up; safe to leave).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend pytest suite at /app/backend/tests/test_smartcity.py covers auth, departments, routing, reports CRUD, AI preview, duplicates, upvote, comments, status update RBAC, uploads (JPEG via Pillow), analytics, notifications. The /api/ws WebSocket endpoint accepts ?token= but ingress closes connection immediately — likely environment/ingress config issue, not application bug. Citizen submit UI flow can't be fully tested without geolocation; verify via direct POST /api/reports (already covered). Frontend route paths: /citizen, /citizen/submit, /citizen/map, /officer, /officer/map, /admin, /admin/{departments,officers,routing,map}, /reports/:id. CityMap renders Leaflet CircleMarkers (SVG circles), NOT default marker icons — don't use .leaflet-marker-icon selector.",
+  "rca of the issue": "Departments count: ai_service.DEFAULT_ROUTING has 11 categories mapping to only 9 unique department names. Seed deduplicates via `set(DEFAULT_ROUTING.values())` → 9 docs. Fix: add 1-2 more unique department names in DEFAULT_ROUTING (e.g., split 'Public Works Department' into 'Roads Department' for Road Damage) OR explicitly seed 10 departments and link categories. WebSocket: app code is correct (token query auth, accept, broadcast). The wss handshake fails at ingress layer; backend likely never sees it. Need to verify ingress allows Upgrade: websocket on /api/ws path."
+}
