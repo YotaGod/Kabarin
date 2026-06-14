@@ -28,27 +28,13 @@
 
 ## 📸 Application Screenshots
 
-Here are some of the primary interfaces of the **Kota Pintar** application:
+Here are the 4 primary interfaces of the **Kota Pintar** application:
 
-### Landing Page & Citizen Dashboard
 | Landing Page | Citizen Dashboard |
 |---|---|
 | ![Landing Page](./Preview/Landing%20Page.jpeg) | ![Citizen Dashboard](./Preview/Dashboard%20Citizen.jpeg) |
-
-### Report Submission & Details
-| Report Submission Form | Report Details View |
-|---|---|
-| ![Report Submission](./Preview/Form%20Report.jpeg) | ![Report Details](./Preview/Form%20Report%202.jpeg) |
-
-### Admin & Staff Management Panel
-| Admin Report Queue | Admin Officers Directory |
-|---|---|
-| ![Report Queue](./Preview/Page%20Queue%20Report.jpeg) | ![Officers Directory](./Preview/Page%20Admin%20Officer.jpeg) |
-
-### Interactive Mapping & Spatial Reports
-| Interactive Leaflet Map | Regional Report Analytics |
-|---|---|
-| ![Interactive Map](./Preview/Page%20Interactive%20Map.jpeg) | ![Regional Reports](./Preview/Page%20Regional%20Report.jpeg) |
+| **Interactive Map (Leaflet)** | **Report Queue (Admin)** |
+| ![Interactive Map](./Preview/Page%20Interactive%20Map.jpeg) | ![Report Queue](./Preview/Page%20Queue%20Report.jpeg) |
 
 ---
 

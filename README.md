@@ -28,27 +28,13 @@
 
 ## 📸 Galeri & Tampilan Aplikasi
 
-Berikut adalah beberapa tampilan utama dari aplikasi **Kota Pintar**:
+Berikut adalah 4 tampilan utama dari aplikasi **Kota Pintar**:
 
-### Halaman Utama & Dashboard Warga
 | Halaman Landing | Dashboard Warga |
 |---|---|
 | ![Landing Page](./Preview/Landing%20Page.jpeg) | ![Dashboard Warga](./Preview/Dashboard%20Citizen.jpeg) |
-
-### Pengiriman Laporan & Detail Laporan
-| Form Pengiriman Laporan | Detail Laporan Warga |
-|---|---|
-| ![Form Report](./Preview/Form%20Report.jpeg) | ![Form Report Detail](./Preview/Form%20Report%202.jpeg) |
-
-### Halaman Admin & Dinas
-| Dashboard Antrean Keluhan (Admin) | Dashboard Manajemen Petugas (Admin) |
-|---|---|
-| ![Queue Report](./Preview/Page%20Queue%20Report.jpeg) | ![Admin Officers](./Preview/Page%20Admin%20Officer.jpeg) |
-
-### Peta Interaktif & Visualisasi Wilayah
-| Peta Interaktif (Leaflet) | Laporan per Wilayah |
-|---|---|
-| ![Interactive Map](./Preview/Page%20Interactive%20Map.jpeg) | ![Regional Report](./Preview/Page%20Regional%20Report.jpeg) |
+| **Peta Interaktif (Leaflet)** | **Dashboard Keluhan (Admin)** |
+| ![Interactive Map](./Preview/Page%20Interactive%20Map.jpeg) | ![Queue Report](./Preview/Page%20Queue%20Report.jpeg) |
 
 ---
 
