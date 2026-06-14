@@ -32,9 +32,7 @@ export default function Login() {
                 />
                 <div className="relative z-10 p-12 h-full flex flex-col">
                     <Link to="/" className="flex items-center gap-2" data-testid="login-logo">
-                        <div className="w-9 h-9 rounded-md bg-white/20 backdrop-blur flex items-center justify-center">
-                            <ShieldStar weight="fill" size={20} />
-                        </div>
+                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-md object-cover" />
                         <div className="font-heading font-semibold">Smart City &amp; Public</div>
                     </Link>
                     <div className="mt-auto">

@@ -60,9 +60,7 @@ export default function Navbar() {
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-border" data-testid="app-navbar">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-16 flex items-center gap-6">
                 <Link to={user ? roleHome(user.role) : "/"} className="flex items-center gap-2" data-testid="logo-link">
-                    <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                        <ShieldStar weight="fill" size={18} className="text-white" />
-                    </div>
+                    <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-md object-cover" />
                     <div className="leading-tight">
                         <div className="font-heading font-semibold text-sm">Smart City</div>
                         <div className="label-mono text-[9px]">& Public</div>

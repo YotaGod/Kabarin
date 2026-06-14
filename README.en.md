@@ -2,6 +2,8 @@
 
 # Kota Pintar (Smart City) 🏙️
 
+![Smart City Banner](./Preview/banner.png)
+
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react)](https://reactjs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb)](https://www.mongodb.com/)
@@ -21,6 +23,32 @@
   - **Officers**: Manage assigned tasks, update work progress, and post resolution updates.
   - **Admins**: Manage departments, officers, automatic routing rules, and view city KPI analytics.
 - **Real-Time Notifications**: Instant two-way communication using the WebSocket protocol for real-time status updates and comments.
+
+---
+
+## 📸 Application Screenshots
+
+Here are some of the primary interfaces of the **Kota Pintar** application:
+
+### Landing Page & Citizen Dashboard
+| Landing Page | Citizen Dashboard |
+|---|---|
+| ![Landing Page](./Preview/Landing%20Page.jpeg) | ![Citizen Dashboard](./Preview/Dashboard%20Citizen.jpeg) |
+
+### Report Submission & Details
+| Report Submission Form | Report Details View |
+|---|---|
+| ![Report Submission](./Preview/Form%20Report.jpeg) | ![Report Details](./Preview/Form%20Report%202.jpeg) |
+
+### Admin & Staff Management Panel
+| Admin Report Queue | Admin Officers Directory |
+|---|---|
+| ![Report Queue](./Preview/Page%20Queue%20Report.jpeg) | ![Officers Directory](./Preview/Page%20Admin%20Officer.jpeg) |
+
+### Interactive Mapping & Spatial Reports
+| Interactive Leaflet Map | Regional Report Analytics |
+|---|---|
+| ![Interactive Map](./Preview/Page%20Interactive%20Map.jpeg) | ![Regional Reports](./Preview/Page%20Regional%20Report.jpeg) |
 
 ---
 
